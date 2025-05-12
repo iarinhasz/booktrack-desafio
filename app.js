@@ -55,6 +55,29 @@ app.post('/principal', function(req, res){
 
 });
 
+//ROTA DO LOGIN
+app.get('/login', function(req, res){
+    res.render('loginUsuario');
+});
+app.post('/login', function(req, res){
+    let email = req.body.email.trim();
+    let senha = req.body.senha.trim();
+    
+    let sql = `SELECT email, senha FROM usuario WHERE email = '${email}' AND senha = '${senha}'`;
+    conexao.query(sql, function(erro, retorno){
+        if(erro) throw erro;
+
+        if(retorno.length > 0 ){
+            res.send("Sucesso no login");
+        }
+        else{
+            res.send("email ou senha incorretos");
+        }
+    });
+
+
+});
+
 //ROTA DO CADASTRO
 app.get('/cadastrar', function(req, res){ //renderizar
     res.render('cadastroUsuario');
