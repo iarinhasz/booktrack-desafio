@@ -1,0 +1,30 @@
+{
+  "name": "booktrack",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "nodejs",
+    "backend",
+    "gerenciamento",
+    "leitura",
+    "livros",
+    "usuario"
+  ],
+  "author": "Iara Yasmin",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "bootstrap": "^5.3.6",
+    "express": "^5.1.0",
+    "express-fileupload": "^1.5.1",
+    "express-handlebars": "^8.0.3",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.14.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
