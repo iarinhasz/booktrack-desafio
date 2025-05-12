@@ -2,12 +2,16 @@
 const express = require('express');
 const mysql = require('mysql2');
 const { engine } = require('express-handlebars');
-
 const app = express();
+const session = require('express-session');
+app.use(session({
+    secret: 'segredo-super-seguro',
+    resave: false,
+    saveUninitialized: true
+}));
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-
 
 app.use('/bootstrap', express.static('./node_modules/bootstrap/dist'));
 
@@ -63,12 +67,15 @@ app.post('/login', function(req, res){
     let email = req.body.email.trim();
     let senha = req.body.senha.trim();
     
-    let sql = `SELECT email, senha FROM usuario WHERE email = '${email}' AND senha = '${senha}'`;
+    let sql = `SELECT id, email FROM usuario WHERE email = '${email}' AND senha = '${senha}'`;
+    
     conexao.query(sql, function(erro, retorno){
         if(erro) throw erro;
 
         if(retorno.length > 0 ){
-            res.send("Sucesso no login");
+            req.session.usuarioId = retorno[0].id;
+            console.log("sessao criada: ", req.session);
+            res.redirect('/paginaInicial');
         }
         else{
             res.send("email ou senha incorretos");
@@ -114,5 +121,73 @@ app.post('/cadastrar', function(req, res){
         res.redirect('/');
     });
 });
+
+//ROTA PAGINA INICIAL
+app.get('/paginaInicial', function(req, res){
+    res.render('paginaInicial');
+});
+app.post('/paginaInicial', function(req, res){
+    const cursor = req.body.cursor;
+    //cadastrar livro
+    if (cursor === "Cadastrar Livro"){
+        res.redirect(`/livros/cadastrar`);
+    }
+    //consultar (listagem) livros
+    else if (cursor === "Consultar Livros"){
+        res.redirect('/livros/consultar');
+    }
+    else {
+        res.send("Opção inválida");
+    }
+
+});
+
+//rota cadastrar livro
+app.get('/livros/cadastrar', function(req, res){
+    const usuario_id = req.session.usuarioId;
+    if (!usuario_id) {
+        return res.send("Usuario nao autenticado");
+    }
+    res.render('cadastroLivros', { usuario_id });
+});
+app.post('/livros/cadastrar', function(req, res){
+    const usuario_id = req.body.usuario_id;
+
+    let titulo = req.body.titulo;
+    let autor = req.body.autor;
+    let status = req.body.status;
+    let avaliacao = req.body.avaliacao;
+    let data_conclusao = req.body.data_conclusao;
+
+    if(!titulo || titulo.length < 3 || titulo > 100){
+        return res.send("Entre 3 e 100 caracteres");
+    }
+/*
+    if(status === "Quero Ler"){
+        //lista de desejos
+    }
+    if(status === "Lendo"){
+        //progresso
+    }
+*/
+
+    let sql;
+    
+    if(status === "Lido"){
+        if(!data_conclusao) return res.send("Campo 'data de conclusao obrigatorio");
+        sql = `INSERT INTO livro (titulo, autor, status, avaliacao, data_conclusao, usuario_id) VALUES  ('${titulo}', '${autor}', '${status}', '${avaliacao}', '${data_conclusao}', '${usuario_id}')`;
+    }
+    else{
+        sql = `INSERT INTO livro (titulo, autor, status, usuario_id) VALUES  ('${titulo}', '${autor}', '${status}', '${usuario_id}')`;
+    }
+
+    conexao.query(sql, function(erro, retorno){
+        if(erro) throw erro;
+        res.redirect('/paginaInicial');
+    });
+});
+
+
+
 //serv
 app.listen(8080);

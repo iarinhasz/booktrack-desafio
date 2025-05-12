@@ -1,0 +1,38 @@
+<h2>Cadastrar Livro</h2>
+
+<form action="/livros/cadastrar" method="POST">
+    <label for="titulo">Título do livro</label><br>
+    <input type="text" name="titulo" id="titulo" required><br><br>
+
+    <label for="autor">Autor do livro</label><br>
+    <input type="text" name="autor" id="autor" required><br><br>
+
+    <label for="status">Status</label><br>
+    <select name="status" id="status" required>
+        <option value="">Selecione...</option>
+        <option value="Quero Ler">Quero Ler</option>
+        <option value="Lendo">Lendo</option>
+        <option value="Lido">Lido</option>
+    </select><br><br>
+
+    <!-- Campo oculto SEMPRE enviado -->
+    <input type="hidden" name="usuario_id" value="{{usuario_id}}">
+
+    <!-- Campos extras apenas se "Lido" -->
+    <div id="extras" style="display: none;">
+        <label for="avaliacao">Avaliação (opcional)</label><br>
+        <input type="text" name="avaliacao" id="avaliacao"><br><br>
+
+        <label for="data_conclusao">Data de conclusão (obrigatória se "Lido")</label><br>
+        <input type="date" name="data_conclusao" id="data_conclusao"><br><br>
+    </div>
+
+    <button type="submit">Cadastrar</button>
+</form>
+
+<script>
+document.getElementById("status").addEventListener("change", function() {
+    const extras = document.getElementById("extras");
+    extras.style.display = this.value === "Lido" ? "block" : "none";
+});
+</script>
