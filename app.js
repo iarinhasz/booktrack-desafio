@@ -5,6 +5,10 @@ const { engine } = require('express-handlebars');
 
 const app = express();
 
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+
 app.use('/bootstrap', express.static('./node_modules/bootstrap/dist'));
 
 app.use('/css', express.static('./css'));
@@ -51,5 +55,41 @@ app.post('/principal', function(req, res){
 
 });
 
+//ROTA DO CADASTRO
+app.get('/cadastrar', function(req, res){ //renderizar
+    res.render('cadastroUsuario');
+});
+app.post('/cadastrar', function(req, res){
+    let nome = req.body.nome;
+    let id = req.body.id;
+    let email = req.body.email;
+    let senha = req.body.senha;
+
+    //NOME >3 CARACTERES
+    if(!nome || nome.length < 3){
+        return res.send("O nome deve ter no minimo 3 caracteres");
+    }
+    //id eh o cpf
+    const cpfValido = /^\d{11}$/;
+    if(!id || !cpfValido.test(id)){
+        return res.send("O cpf deve conter exatamente 11 digitos numericos");
+    }
+    //email valido
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailValido.test(email)) {
+        return res.send("O e-mail não é válido.");
+    }
+    //senha >8 catarcete
+    if(!senha || senha.length<8){
+        return res.send("A senha deve ter no minimo 8 caracteres");
+    }
+
+    let sql =`INSERT INTO usuario (id, nome, email, senha)  VALUES ('${id}', '${nome}', '${email}', '${senha}')`;
+    conexao.query(sql, function(erro, retorno){
+        if(erro) throw erro;
+        console.log(retorno);
+        res.redirect('/');
+    });
+});
 //serv
 app.listen(8080);

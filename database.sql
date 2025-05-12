@@ -1,5 +1,5 @@
 CREATE TABLE usuario(
-    id INT PRIMARY KEY,
+    id VARCHAR(11) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email varchar(100) UNIQUE NOT NULL,
     senha VARCHAR(15) NOT NULL
@@ -11,7 +11,7 @@ CREATE TABLE livro (
     status ENUM('quero ler', 'lendo', 'lido') NOT NULL,
     avaliacao INT CHECK (avaliacao BETWEEN 1 AND 5),
     data_conclusao DATE,
-    usuario_id INT NOT NULL,
+    usuario_id VARCHAR(11) NOT NULL,
 
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
