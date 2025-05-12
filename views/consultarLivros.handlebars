@@ -1,0 +1,15 @@
+<h2>Consultar Livros</h2>
+
+<form action="/livros/consultar" method="GET">
+</form>
+
+{{#if livros.length}}
+    <h3>Resultados:</h3>
+    <ul>
+        {{#each livros}}
+            <li>{{this.titulo}} - {{this.autor}}</li>
+        {{/each}}
+    </ul>
+{{else}}
+    <p>Nenhum livro encontrado.</p>
+{{/if}}

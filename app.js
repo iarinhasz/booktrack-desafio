@@ -162,15 +162,6 @@ app.post('/livros/cadastrar', function(req, res){
     if(!titulo || titulo.length < 3 || titulo > 100){
         return res.send("Entre 3 e 100 caracteres");
     }
-/*
-    if(status === "Quero Ler"){
-        //lista de desejos
-    }
-    if(status === "Lendo"){
-        //progresso
-    }
-*/
-
     let sql;
     
     if(status === "Lido"){
@@ -186,7 +177,14 @@ app.post('/livros/cadastrar', function(req, res){
         res.redirect('/paginaInicial');
     });
 });
-
+//ROTA CONSULTAR LIVROS (LISTAGEM)
+app.get('/livros/consultar', function(req, res){
+    let sql = 'SELECT * FROM livro';
+    conexao.query(sql, function(erro, retorno){
+        if (erro) throw erro;
+        res.render('consultarLivros', { livros: retorno });
+    });
+});
 
 
 //serv
