@@ -13,6 +13,18 @@ app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 
+const conexao = mysql.createConnection({
+    host: 'localhost',
+    user: 'iarinhasz',
+    password: 'sua_senha',
+    database: 'booktrack'
+});
+//teste conectcao
+conexao.connect(function(erro){
+    if(erro) throw erro;
+    console.log('conexao ok');
+});
+
 //renderizar
 app.get('/', function(req, res){
     res.render('principal')
