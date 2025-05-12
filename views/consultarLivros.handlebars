@@ -1,13 +1,22 @@
 <h2>Consultar Livros</h2>
 
-<form action="/livros/consultar" method="GET">
+<form action="/livros/consultar" method="POST">
+    <label for="status">Filtar por status: </label>
+    <select name="status" id="status" required>
+        <option value="todos">Sem filtro</option>
+        <option value="quero ler">Quero ler</option>
+        <option value="lendo">Lendo</option>
+        <option value="lido">Lido</option>
+    </select>
+    <br><br>
+    <button type="submit">Buscar</button>
 </form>
 
 {{#if livros.length}}
     <h3>Resultados:</h3>
     <ul>
         {{#each livros}}
-            <li>{{this.titulo}} - {{this.autor}}</li>
+            <li><strong>{{this.titulo}}</strong> - {{this.status}}</li>
         {{/each}}
     </ul>
 {{else}}

@@ -185,6 +185,23 @@ app.get('/livros/consultar', function(req, res){
         res.render('consultarLivros', { livros: retorno });
     });
 });
+// ROTA CONSULTAR LIVROS COM CONSULTA
+app.post('/livros/consultar', function(req, res){
+    const status = req.body.status;
+    
+    let sql = `SELECT * FROM livro`;
+    let aux = [];
+
+    if(status && status !=='todos'){
+        sql += ' WHERE status = ?';
+        aux.push(status);
+    }
+    conexao.query(sql, aux,function(erro, retorno){
+        if(erro) throw erro;
+        res.render('consultarLivros', {livros: retorno});
+    });
+
+});
 
 
 //serv
