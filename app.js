@@ -132,6 +132,8 @@ app.get('/paginaInicial', function(req, res){
 });
 app.post('/paginaInicial', function(req, res){
     const cursor = req.body.cursor;
+    console.log("Valor de cursor recebido:", cursor);
+
     //cadastrar livro
     if (cursor === "Cadastrar Livro"){
         res.redirect(`/livros/cadastrar`);
@@ -143,6 +145,10 @@ app.post('/paginaInicial', function(req, res){
     //editar livros
     else if(cursor === "Editar Livros"){
         res.redirect('/livros/editar');
+    }
+    //exluir
+    else if(cursor === "Excluir Livros"){
+        res.redirect('/livros/excluir');
     }
     else {
         res.send("Opção inválida");
@@ -343,6 +349,30 @@ app.post('/livros/editar', function(req, res){
     });
 });
 
+app.get('/livros/excluir', function(req, res){
+    const usuario_id = req.session.usuarioId;
+    if(!usuario_id) return res.send("usuario nao autenticado");
 
+    //lista titulos
+    const sql = `SELECT id, titulo FROM livro WHERE usuario_id = '${usuario_id}'`;
+    conexao.query(sql, function(erro, retorno){
+        if (erro) throw erro;
+        console.log("livros: ", retorno);
+        res.render('excluirLivros', { livros: retorno });
+    });
+
+});
+app.post('/livros/excluir', function(req, res){
+    const usuario_id = req.session.usuarioId;
+    if(!usuario_id) return res.send("usuario nao autenticado");
+
+    const livroId = req.body.livro_id;
+
+    const sql = `DELETE FROM livro WHERE id = '${livroId}' AND usuario_id = '${usuario_id}'`;
+    conexao.query(sql, function(erro, retorno){
+        if(erro) throw erro;
+        res.redirect('/paginaInicial');
+    });
+});
 //serv
 app.listen(8080);

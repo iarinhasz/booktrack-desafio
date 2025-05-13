@@ -1,0 +1,12 @@
+<h2>Excluir Livro</h2>
+
+<form action="/livros/excluir" method="POST">
+    <label for="livro_id">Selecione um livro para excluir</label>
+    <select name="livro_id" id="livro_id" required>
+        {{#each livros}}
+            <option value="{{this.id}}" >{{this.titulo}}</option>
+        {{/each}}
+    </select>
+
+    <button type="submit">Excluir</button>
+</form>
