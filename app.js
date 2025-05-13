@@ -124,6 +124,10 @@ app.post('/cadastrar', function(req, res){
 
 //ROTA PAGINA INICIAL
 app.get('/paginaInicial', function(req, res){
+    console.log("Sessão ativa?", req.session);
+    const usuario_id = req.session.usuarioId;
+    if (!usuario_id) return res.redirect('/login');
+
     res.render('paginaInicial');
 });
 app.post('/paginaInicial', function(req, res){
@@ -183,7 +187,10 @@ app.post('/livros/cadastrar', function(req, res){
 });
 //ROTA CONSULTAR LIVROS (LISTAGEM)
 app.get('/livros/consultar', function(req, res){
-    let sql = 'SELECT * FROM livro';
+    const usuario_id = req.session.usuarioId;
+    if(!usuario_id) return res.send("usuario nao autenticado");
+
+    let sql = `SELECT * FROM livro WHERE usuario_id = '${usuario_id}'`;
     conexao.query(sql, function(erro, retorno){
         if (erro) throw erro;
         res.render('consultarLivros', { livros: retorno });
@@ -209,8 +216,11 @@ app.post('/livros/consultar', function(req, res){
 
 //ROTA EDITAR LIVROS
 app.get('/livros/editar', function(req, res){
+    const usuario_id = req.session.usuarioId;
+    if(!usuario_id) return res.send("usuario nao autenticado");
+
     //entrar e aparecer apenas com status != lido
-    const sql = "SELECT id, titulo FROM livro WHERE status != 'lido'";
+    const sql = `SELECT id, titulo FROM livro WHERE status != 'lido' AND usuario_id = '${usuario_id}'`;
     conexao.query(sql, function(erro, retorno){
         if (erro) throw erro;
         console.log("livros: ", retorno);
