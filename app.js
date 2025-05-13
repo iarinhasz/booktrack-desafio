@@ -259,24 +259,24 @@ app.get('/livros/consultar', function(req, res){
 });
 // ROTA CONSULTAR LIVROS COM CONSULTA
 app.post('/livros/consultar', function(req, res){
-    
     const usuario_id = req.session.usuarioId;
-    if(!usuario_id) return res.send("Usuário não autenticado");
-
     const status = req.body.status;
-    
-    let sql = `SELECT * FROM livro WHERE usuario_id = '${usuario_id}'`;
-    let aux = [usuario_id];
 
-    if(status && status !=='todos'){
-        sql += ' AND status = ?';
-        aux.push(status);
+    let sql;
+    let aux;
+
+    if(status && status !== 'todos'){
+        sql = `SELECT * FROM livro WHERE usuario_id = ? AND status = ?`;
+        aux = [usuario_id, status];
+    } else {
+        sql = `SELECT * FROM livro WHERE usuario_id = ?`;
+        paux = [usuario_id];
     }
-    conexao.query(sql, aux,function(erro, retorno){
-        if(erro) throw erro;
-        res.render('consultarLivros', {livros: retorno});
-    });
 
+    conexao.execute(sql, aux, function(erro, retorno){
+        if(erro) throw erro;
+        res.render('consultarLivros', { livros: retorno });
+    });
 });
 
 //ROTA EDITAR LIVROS
