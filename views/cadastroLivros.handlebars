@@ -4,8 +4,8 @@
     <label for="titulo">Título do livro</label><br>
     <input type="text" name="titulo" id="titulo" required><br><br>
 
-    <label for="autor">Autor do livro</label><br>
-    <input type="text" name="autor" id="autor" required><br><br>
+    <label for="autor">Autor do livro (opcional)</label><br>
+    <input type="text" name="autor" id="autor"><br><br>
 
     <label for="status">Status</label><br>
     <select name="status" id="status" required>
@@ -14,8 +14,6 @@
         <option value="Lendo">Lendo</option>
         <option value="Lido">Lido</option>
     </select><br><br>
-
-    <input type="hidden" name="usuario_id" value="{{usuario_id}}">
 
     <div id="extras" style="display: none;">
         <label for="avaliacao">Avaliação (opcional)</label><br>

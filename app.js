@@ -174,6 +174,36 @@ app.get('/usuario/lista', function(req, res){
     });
 });
 
+//rota excluir usuario
+app.get('/usuario/excluir', function(req,res){
+    const usuario_id = req.session.usuarioId;
+    if (!usuario_id) {
+        return res.send("Usuário não autenticado");
+    }
+    res.render('excluirUsuario');
+});
+app.post('/usuario/excluir', function(req, res){
+    const usuario_id = req.session.usuarioId;
+    if (!usuario_id) {
+        return res.send("Usuário não autenticado");
+    }
+    //livros >> usuario
+    const sqlExcluir = `DELETE FROM livro WHERE usuario_id = '${usuario_id}'`;
+    conexao.query(sqlExcluir, function(erro){
+        if(erro) throw erro;
+
+        const sqlExcluirUsuario = `DELETE FROM usuario WHERE id = '${usuario_id}'`;
+        conexao.query(sqlExcluirUsuario, function(erro2){
+            if(erro2) throw erro;
+
+            req.session.destroy();
+            res.send("Conta excluída com sucesso. <a href='/'>Voltar ao início</a>");
+        });
+    });
+
+});
+
+
 //rota cadastrar livro
 app.get('/livros/cadastrar', function(req, res){
     const usuario_id = req.session.usuarioId;
@@ -183,32 +213,39 @@ app.get('/livros/cadastrar', function(req, res){
     res.render('cadastroLivros', { usuario_id });
 });
 app.post('/livros/cadastrar', function(req, res){
-    const usuario_id = req.body.usuario_id;
+    const usuario_id = req.session.usuarioId;
 
     let titulo = req.body.titulo;
-    let autor = req.body.autor;
+    let autor = req.body.autor || null;
     let status = req.body.status;
-    let avaliacao = req.body.avaliacao;
+    let avaliacao = req.body.avaliacao || null;
     let data_conclusao = req.body.data_conclusao;
 
     if(!titulo || titulo.length < 3 || titulo > 100){
         return res.send("Entre 3 e 100 caracteres");
     }
-    let sql;
-    
+
     if(status === "Lido"){
-        if(!data_conclusao) return res.send("Campo 'data de conclusao obrigatorio");
-        sql = `INSERT INTO livro (titulo, autor, status, avaliacao, data_conclusao, usuario_id) VALUES  ('${titulo}', '${autor}', '${status}', '${avaliacao}', '${data_conclusao}', '${usuario_id}')`;
+        if(!data_conclusao) return res.send("Campo 'data de conclusao' obrigatório");
+
+        const sql = `INSERT INTO livro (titulo, autor, status, avaliacao, data_conclusao, usuario_id)
+            VALUES (?, ?, ?, ?, ?, ?)`;
+
+        conexao.execute(sql, [titulo, autor, status, avaliacao, data_conclusao, usuario_id], function(erro){
+            if(erro) throw erro;
+            res.redirect('/paginaInicial');
+        });
     }
     else{
-        sql = `INSERT INTO livro (titulo, autor, status, usuario_id) VALUES  ('${titulo}', '${autor}', '${status}', '${usuario_id}')`;
+        const sql = `INSERT INTO livro (titulo, autor, status, usuario_id)
+            VALUES (?, ?, ?, ?)`;
+        conexao.execute(sql, [titulo, autor, status, usuario_id], function(erro){
+            if(erro) throw erro;
+            res.redirect('/paginaInicial');
+        });
     }
-
-    conexao.query(sql, function(erro, retorno){
-        if(erro) throw erro;
-        res.redirect('/paginaInicial');
-    });
 });
+
 //ROTA CONSULTAR LIVROS (LISTAGEM)
 app.get('/livros/consultar', function(req, res){
     const usuario_id = req.session.usuarioId;
@@ -222,13 +259,17 @@ app.get('/livros/consultar', function(req, res){
 });
 // ROTA CONSULTAR LIVROS COM CONSULTA
 app.post('/livros/consultar', function(req, res){
+    
+    const usuario_id = req.session.usuarioId;
+    if(!usuario_id) return res.send("Usuário não autenticado");
+
     const status = req.body.status;
     
-    let sql = `SELECT * FROM livro`;
-    let aux = [];
+    let sql = `SELECT * FROM livro WHERE usuario_id = '${usuario_id}'`;
+    let aux = [usuario_id];
 
     if(status && status !=='todos'){
-        sql += ' WHERE status = ?';
+        sql += ' AND status = ?';
         aux.push(status);
     }
     conexao.query(sql, aux,function(erro, retorno){
@@ -251,7 +292,6 @@ app.get('/livros/editar', function(req, res){
         res.render('editarLivros', { livros: retorno });
     });
 });
-
 app.post('/livros/editar', function(req, res){
     //quero ler > lendo || lendo > lido
     
@@ -367,6 +407,7 @@ app.post('/livros/editar', function(req, res){
     });
 });
 
+//ROTA EXCLUIR LIVROS
 app.get('/livros/excluir', function(req, res){
     const usuario_id = req.session.usuarioId;
     if(!usuario_id) return res.send("usuario nao autenticado");
