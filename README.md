@@ -42,22 +42,39 @@
 
 ## 🗂️ Organização do Projeto
 📁 BookTrack/
+
 ├── app.js # Arquivo principal com rotas e lógica da aplicação
+
 ├── database.sql
+
 ├── package.json
+
 ├── package-lock.json
+
 ├── /views # Templates Handlebars
+
 │ ├── principal.handlebars
+
 │ ├── paginaInicial.handlebars
+
 │ ├── loginUsuario.handlebars
+
 │ ├── cadastroUsuario.handlebars
+
 │ ├── excluirUsuario.handlebars
+
 │ ├── listarUsuario.handlebars
+
 │ ├── cadastroLivros.handlebars
+
 │ ├── consultarLivros.handlebars
+
 │ ├── editarLivros.handlebars
+
 │ └── excluirLivros.handlebars
+
 ├── /css #sem uso
+
 ├── /node_modules
 
 
@@ -116,15 +133,16 @@ Acesse após login:
    `npm install`
 
 3. Configure o acesso ao banco no arquivo `app.js`
-    const conexao = mysql.createConnection({
-    host: 'localhost',
-    user: 'seu_usuario',
-    password: 'sua_senha',
-    database: 'booktrack'
-    });
 
-4. Inicie o projeto:
+   const conexao = mysql.createConnection({
+   host: 'localhost',
+   user: 'seu_usuario',
+   password: 'sua_senha',
+   database: 'booktrack'
+   });
+
+5. Inicie o projeto:
     `node app.js`
 
-5. Acesse o navegador:
+6. Acesse o navegador:
     http://localhost:8080
