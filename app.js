@@ -49,9 +49,6 @@ app.post('/principal', function(req, res){
     else if(cursor === "cadastrar"){
         res.redirect('/cadastrar');
     }
-    else if(cursor === "painelAdm"){
-        res.redirect('/painelAdm');
-    }
     else{
         res.send("invalido");
     }
@@ -133,10 +130,17 @@ app.get('/paginaInicial', function(req, res){
 app.post('/paginaInicial', function(req, res){
     const cursor = req.body.cursor;
     console.log("Valor de cursor recebido:", cursor);
-
+    /*FUNCIONALISADES DO USUARIO*/
+    if(cursor == "Listar Dados"){
+        res.redirect('/usuario/lista');
+    }
+    else if(cursor == "Excluir conta"){
+        res.redirect('/usuario/excluir');
+    }
+    /*FUNCIONALIDADES DOS LIVROS*/
     //cadastrar livro
-    if (cursor === "Cadastrar Livro"){
-        res.redirect(`/livros/cadastrar`);
+    else if (cursor === "Cadastrar Livro"){
+        res.redirect('/livros/cadastrar');
     }
     //consultar (listagem) livros
     else if (cursor === "Consultar Livros"){
@@ -154,6 +158,20 @@ app.post('/paginaInicial', function(req, res){
         res.send("Opção inválida");
     }
 
+});
+
+//rota listar dados do usuarios
+app.get('/usuario/lista', function(req, res){
+    const usuario_id = req.session.usuarioId;
+    if (!usuario_id) {
+        return res.send("Usuario nao autenticado");
+    }
+    const sql = `SELECT * FROM usuario WHERE id = '${usuario_id}'`;
+    conexao.query(sql, function(erro, retorno){
+        if(erro) throw erro;
+        console.log("Usuario: ", retorno);
+        res.render('listarUsuario', {dados: retorno});
+    });
 });
 
 //rota cadastrar livro
