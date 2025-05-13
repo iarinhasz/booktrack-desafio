@@ -136,6 +136,10 @@ app.post('/paginaInicial', function(req, res){
     else if (cursor === "Consultar Livros"){
         res.redirect('/livros/consultar');
     }
+    //editar livros
+    else if(cursor === "Editar Livros"){
+        res.redirect('/livros/editar');
+    }
     else {
         res.send("Opção inválida");
     }
@@ -201,6 +205,132 @@ app.post('/livros/consultar', function(req, res){
         res.render('consultarLivros', {livros: retorno});
     });
 
+});
+
+//ROTA EDITAR LIVROS
+app.get('/livros/editar', function(req, res){
+    //entrar e aparecer apenas com status != lido
+    const sql = "SELECT id, titulo FROM livro WHERE status != 'lido'";
+    conexao.query(sql, function(erro, retorno){
+        if (erro) throw erro;
+        console.log("livros: ", retorno);
+        res.render('editarLivros', { livros: retorno });
+    });
+});
+
+app.post('/livros/editar', function(req, res){
+    //quero ler > lendo || lendo > lido
+    
+    // const cursor = req.body.cursor;
+    const id = req.body.id;
+    const novoTitulo = req.body.novoTitulo;
+    const novoAutor = req.body.novoAutor || null;
+    const novoStatus = req.body.novoStatus;
+    const avaliacao = req.body.avaliacao || null;
+    const dataConclusao = req.body.dataConclusao;
+    
+    //let novoValor;
+
+    let sql = `SELECT status FROM livro WHERE id = '${id}'`;
+    
+    //console.log("cursor", cursor);
+
+    conexao.query(sql, function(erro, retorno){
+        if (erro) throw erro;
+        if (retorno.length === 0){
+            res.send("Livro não encontrado");
+            return;
+        }
+
+        const statusAtual = retorno[0].status.toLowerCase();
+
+        if (statusAtual === "lido") {
+            res.send("Livros concluídos não podem ser editados");
+            return;
+        }
+        //tem q armazenar as modificacoes em um bloco, um por um n funciona
+        let updates = [];
+
+        if(novoTitulo) updates.push(`titulo = '${novoTitulo}'`);
+
+        /*else if (novoTitulo) {
+            let sqlAt = `UPDATE livro SET titulo = '${novoTitulo}' WHERE id = '${id}'`;
+            conexao.query(sqlAt, function(erro){
+                if (erro) throw erro;
+                res.send("Título atualizado!");
+                //res.redirect('/livros/editar');
+            });
+        }*/
+
+        if(novoAutor) updates.push(`autor = '${novoAutor}'`);
+
+        /*else if (novoAutor) {
+            let sqlAt = `UPDATE livro SET autor = '${novoAutor}' WHERE id = '${id}'`;
+            conexao.query(sqlAt, function(erro){
+                if (erro) throw erro;
+                res.send("Autor atualizado!");
+            });
+        }*/
+        if(novoStatus && novoStatus !== statusAtual){
+            if(statusAtual === "quero ler" && novoStatus === "lendo"){
+                updates.push(`status = 'lendo'`);
+            }
+            else if(statusAtual === "lendo" && novoStatus === "lido"){
+                updates.push(`status = 'lido'`);
+                if(avaliacao) updates.push(`avaliacao = '${avaliacao}'`);
+                if(dataConclusao) updates.push(`data_conclusao = '${dataConclusao}'`);
+            }
+            else{
+                res.send(`Transição inválida de '${statusAtual}' para '${novoStatus}'.`);
+                return;
+            }
+        }
+
+/*        else if(novoStatus){
+            
+            if(novoStatus === statusAtual){
+                res.send("O status selecioando é igual ao atual");
+                res.redirect('/livros/editar');
+            }
+
+            if(statusAtual === "quero ler" && novoStatus === "lendo"){
+                sql = `UPDATE livro SET status = '${novoStatus}' WHERE id = '${id}'`;
+                conexao.query(sql, function(erro){
+                    if(erro) throw erro;
+                    res.send("status: quero ler > lendo atualizado");
+                });
+            }
+
+            if(statusAtual === "lendo" && novoStatus === "lido"){
+                let avaliacao = req.body.avaliacao || null;
+                let dataConclusao = req.body.dataConclusao;
+                
+                sql = `UPDATE livro SET status = 'lido', avaliacao ='${avaliacao}', data_conclusao = '${dataConclusao}' WHERE id = '${id}'`;
+                conexao.query(sql, function(erro){
+                    if(erro) throw erro;
+                    res.send("status: lendo > lido atualizado");
+                });
+            }
+
+            res.send(`Transição inválida de '${statusAtual}' para '${novoValor}'.`);
+            //res.redirect('/livros/editar');
+
+        }*/
+        if(updates.length === 0){
+            res.send("nenhuma alteracao enviada");
+            return;
+        }
+
+        /*if (cursor === "Voltar Pagina Inicial") {
+            res.redirect('/paginaInicial');
+        }*/
+
+        const sqlAtualizacoes = `UPDATE livro SET ${updates.join(', ')} WHERE id = '${id}'`;
+        conexao.query(sqlAtualizacoes, function(erro){
+            if(erro) throw erro;
+            res.redirect('/livros/editar');
+        });
+    });
 });
 
 

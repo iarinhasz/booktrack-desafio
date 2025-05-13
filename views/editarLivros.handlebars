@@ -1,0 +1,58 @@
+<h1>Editar Livro</h1>
+
+<form action="/livros/editar" method="POST">
+
+    <label for="id">Selecione o Livro (pelo tit):</label>
+    <select name="id" id="selectLivro" required onchange="mostrarCampos()">
+        <option value="">Escolha um livro para editar</option>
+        {{#each livros}}
+            <option value="{{this.id}}">{{this.titulo}}</option>
+        {{/each}}
+    </select>
+
+    <div id="camposEdicao" style="display: none;">
+        <label>Novo Titulo</label>
+        <input type="text" name="novoTitulo">
+        
+        <label>Novo Autor</label>
+        <input type="text" name="novoAutor">
+
+        <label>Status:</label>
+        <select name="novoStatus" id="statusNovo" onchange="verificarStatus()">
+            <option value="quero ler">Quero ler</option>
+            <option value="lendo">Lendo</option>
+            <option value="lido">Lido</option>
+        </select>
+
+        <div id="campoLido" style="display: none;">
+            <label>Avaliacao (1 a 5)</label>
+            <input type="number" name="avaliacao" min="1" max="5">
+
+            <label>Data de conclusão</label>
+            <input type="date" name="dataConclusao">
+        </div>
+
+    </div>
+
+    <br>
+
+    <button type="submit">Salvar alteracoes</button>
+
+</form>
+
+<script>
+    function mostrarCampos() {
+        const livroSelecionado = document.getElementById("selectLivro").value;
+        document.getElementById("camposEdicao").style.display = livroSelecionado ? "block" : "none";
+        verificaStatus();
+    }
+
+    function verificarStatus() {
+        const status = document.getElementById("statusNovo").value;
+        const campoLido = document.getElementById("campoLido");
+        campoLido.style.display = (status === "lido") ? "block" : "none";
+    }
+
+    window.onload = mostrarCampos;
+
+</script>
