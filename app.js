@@ -270,7 +270,7 @@ app.post('/livros/consultar', function(req, res){
         aux = [usuario_id, status];
     } else {
         sql = `SELECT * FROM livro WHERE usuario_id = ?`;
-        paux = [usuario_id];
+        aux = [usuario_id];
     }
 
     conexao.execute(sql, aux, function(erro, retorno){
